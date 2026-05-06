@@ -80,6 +80,7 @@ def calcular_score(datos: dict) -> dict:
     cluster_n   = gmm.predict(df_modelo_nuevo)[0]
     perfil_n    = diccionario_clusters[cluster_n]
     anomalia_n  = iso_forest.predict(df_modelo_nuevo)[0]
+    metabolic_risk_score_n = (imc_n * 0.3) + (riesgo_cintura_n * 2) + (cat_glucosa_n * 2)
 
     return {
         'microbiota_score' : round(score_n, 1),
@@ -88,5 +89,6 @@ def calcular_score(datos: dict) -> dict:
         'imc'              : round(imc_n, 1),
         'diet_score'       : int(diet_score_n),
         'lifestyle_score'  : int(lifestyle_score_n),
-        'microbiota_stress': int(microbiota_stress_n)
+        'microbiota_stress': int(microbiota_stress_n),
+        'metabolic_risk_score': round(metabolic_risk_score_n, 1)
     }

@@ -1,6 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Literal
+from typing import Optional
 
 
 class DatosPaciente(BaseModel):
@@ -44,6 +45,7 @@ class DatosPaciente(BaseModel):
 
 
 class ResultadoPaciente(BaseModel):
+    id_paciente:          str
     microbiota_score:  float
     perfil:            str
     es_anomalia:       bool
@@ -51,3 +53,4 @@ class ResultadoPaciente(BaseModel):
     diet_score:        int
     lifestyle_score:   int
     microbiota_stress: int
+    metabolic_risk_score: float 
