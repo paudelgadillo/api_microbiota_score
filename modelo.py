@@ -83,12 +83,14 @@ def calcular_score(datos: dict) -> dict:
     metabolic_risk_score_n = (imc_n * 0.3) + (riesgo_cintura_n * 2) + (cat_glucosa_n * 2)
 
     return {
-        'microbiota_score' : round(score_n, 1),
-        'perfil'           : perfil_n,
-        'es_anomalia'      : bool(anomalia_n == -1),
-        'imc'              : round(imc_n, 1),
-        'diet_score'       : int(diet_score_n),
-        'lifestyle_score'  : int(lifestyle_score_n),
-        'microbiota_stress': int(microbiota_stress_n),
-        'metabolic_risk_score': round(metabolic_risk_score_n, 1)
+        'microbiota_score'    : round(score_n, 1),
+        'perfil'              : perfil_n,
+        'es_anomalia'         : bool(anomalia_n == -1),
+        'imc'                 : round(imc_n, 1),
+        'diet_score'          : int(diet_score_n),
+        'lifestyle_score'     : int(lifestyle_score_n),
+        'microbiota_stress'   : int(microbiota_stress_n),
+        'metabolic_risk_score': round(metabolic_risk_score_n, 1),
+        # Guardamos los Z-scores para poder reentrenar t-SNE después
+        '_z_scores'           : Z_nuevo[0].tolist()
     }

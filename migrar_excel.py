@@ -1,39 +1,39 @@
 import asyncio
 import pandas as pd
 from datetime import datetime, timezone
-from database import coleccion_resultados
+from database import db
 
-RUTA_EXCEL = 'Reporte_Modelo_Biomatematico_20260505_160701.xlsx'
+RUTA_TSNE = 'datos_tsne_exactos.csv'
 
 def transformar_anomalia(valor: str) -> bool:
-    """Convierte el texto de Anomalia a booleano"""
     if isinstance(valor, str):
         return 'atípico' in valor.lower() or 'atipico' in valor.lower()
     return False
 
-async def migrar():
-    print("Leyendo Excel...")
-    df = pd.read_excel(RUTA_EXCEL)
+async def migrar_graficas():
+    print("Leyendo coordenadas t-SNE exactas del notebook...")
+    df = pd.read_csv(RUTA_TSNE)
+    print(f"  {len(df)} registros encontrados.")
+    print(df.head())
+
+    coleccion_graficas = db["graficas"]
+    await coleccion_graficas.drop()
 
     documentos = []
     for _, fila in df.iterrows():
-        doc = {
-            'id_paciente'         : str(fila['id_match']),  # ← usa su número real
-            'microbiota_score'    : float(fila['Indice_Microbiota']),
-            'perfil'              : str(fila['Perfil_GMM']),
-            'es_anomalia'         : transformar_anomalia(str(fila['Anomalia'])),
-            'imc'                 : float(fila['IMC']),
-            'diet_score'          : int(fila['Diet_Score']),
-            'lifestyle_score'     : int(fila['Lifestyle_Score']),
-            'microbiota_stress'   : int(fila['Microbiota_Stress']),
-            'metabolic_risk_score': float(fila['Metabolic_Risk_Score']),
-            'fecha'               : datetime.now(timezone.utc)
-        }
-        documentos.append(doc)
+        documentos.append({
+            'id_paciente'     : str(fila['id_match']),
+            'perfil'          : str(fila['perfil']),
+            'es_anomalia'     : transformar_anomalia(str(fila['anomalia'])),
+            'anomalia_texto'  : str(fila['anomalia']),
+            'microbiota_score': float(fila['microbiota_score']),
+            'tsne_x'          : float(fila['tsne_x']),
+            'tsne_y'          : float(fila['tsne_y']),
+        })
 
-    print(f"Migrando {len(documentos)} registros a MongoDB...")
-    await coleccion_resultados.insert_many(documentos)
-    print("Migración completada exitosamente.")
+    await coleccion_graficas.insert_many(documentos)
+    print(f"\n{len(documentos)} registros migrados a colección 'graficas'.")
+    print("Verifica en Atlas que los valores tsne_x y tsne_y coincidan con el notebook.")
 
 if __name__ == "__main__":
-    asyncio.run(migrar())
+    asyncio.run(migrar_graficas())
